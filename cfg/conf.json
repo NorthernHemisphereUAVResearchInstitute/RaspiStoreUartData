@@ -1,0 +1,5 @@
+{	
+	"Port":"COM3",
+	"Baud":9600,
+    "SaveLog":true
+}
