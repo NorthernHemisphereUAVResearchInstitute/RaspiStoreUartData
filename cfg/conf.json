@@ -1,5 +1,5 @@
 {	
-	"Port":"COM3",
-	"Baud":9600,
-    "SaveLog":true
+	"Port":"COM4",
+	"Baud":1500000,
+    "SaveLog":false
 }

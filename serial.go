@@ -80,18 +80,21 @@ func receiveCom(s io.ReadWriteCloser) {
 
 //解析处理
 func dealCommInDataByCrc() {
-	maxbuflen := 512 * 2048
+	maxbuflen := 512*2048
 	buf := make([]byte, maxbuflen*2)
 	lenbuf := 0
 	fmt.Println("dealCommInDataByCrc")
 	for {
 		select {
 		case data := <-chanCommIn:
-			if (lenbuf + len(data)) >= maxbuflen/2 { //越界
+			if (lenbuf + len(data)) >= maxbuflen/2{ //越界
 				lenbuf = 0
 			} else {
 				copy(buf[lenbuf:], data)
+
+				//fmt.Println(fmt.Sprintf("%x", buf))
 				lenbuf += len(data)
+				//fmt.Println(lenbuf)
 				//这里应该增加一个判断是否继续处理的函数，看是否是包头，不是包头一直处理,
 				headOffset := 0
 				for {
@@ -99,7 +102,9 @@ func dealCommInDataByCrc() {
 					if bFind {
 						//有数据包，处理
 						newbuf := buf[headOffset+newIndex:]
-						DealMavlinkMsgRecv(newbuf[:])
+						//fmt.Println(fmt.Sprintf("%x", newbuf))
+						fmt.Println(fmt.Sprintf("%x", newbuf[:100]))
+						DealMavlinkMsgRecv(newbuf[:53])
 					} else { //没有数据包了，退出
 						break
 					}

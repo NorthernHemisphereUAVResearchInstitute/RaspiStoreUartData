@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	constCommRawDataChanMaxcount = 512
+	constCommRawDataChanMaxcount = 512*2048
 	constChanMaxcount            = 256
 )
 
@@ -25,9 +25,12 @@ func main() {
 
 	//打开串口
 	StartSerial()
-
+	
 	fmt.Println("Process...")
+
+
 	for {
 		time.Sleep(5 * time.Second)
 	}
 }
+

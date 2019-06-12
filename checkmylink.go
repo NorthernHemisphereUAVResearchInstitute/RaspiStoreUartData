@@ -5,19 +5,20 @@ import (
 )
 
 const (
-	MavlinkSyncFirst    = byte(0x55)              //mavlink packet 第一个标志字节
-	MavlinkIndexDataLen = 1                       //数据长度索引
-	MavlinkIndexMsgId   = 2                       //消息id索引
+	MavlinkSyncFirst    = byte(0x5A)              //mavlink packet 第一个标志字节
+	MavlinkIndexDataLen = 2                      //数据长度索引
+	MavlinkIndexMsgId   = 1                       //消息id索引
 	MavlinkIndexCrc16   = -2                      //crc16索引
 	MavlinkPackHeadLen  = 3                       //包头长度
 	MavlinkPackLenMin   = 5                       //最小数据包长度
-	MavlinkLenMax       = MavlinkPackLenMin + 255 //最大数据包长度
-	VelPosMsgID         = 1
-	VelPosMsgLEN        = 24
+	MavlinkLenMax       = 53 //最大数据包长度
+	VelPosMsgID 		= 0x00
+	VelPosMsgLEN        = 0x30
 )
 
 //检查数据长度是否正确
-func CheckPackDataLen(msgid byte, datalen byte) (bRet bool) {
+//检查数据长度是否正确
+func CheckPackDataLen(msgid byte,datalen byte) (bRet bool) {
 
 	if msgid == VelPosMsgID {
 		if datalen == VelPosMsgLEN {
@@ -34,7 +35,7 @@ func CheckPackDataLen(msgid byte, datalen byte) (bRet bool) {
 func IsValidPackHead(packHead []byte) (bOk bool) {
 	if len(packHead) >= MavlinkPackHeadLen {
 		if packHead[0] == MavlinkSyncFirst { //前导标示符相同
-			if CheckPackDataLen(packHead[MavlinkIndexMsgId], packHead[MavlinkIndexDataLen]) { // 数据包长度
+			if CheckPackDataLen(packHead[MavlinkIndexMsgId],packHead[MavlinkIndexDataLen]) { // 数据包长度
 				bOk = true
 			} else {
 				bOk = false
@@ -61,7 +62,7 @@ func dealMavlinkCommInData(buf []byte, lenbuf int) (bFind bool, newIndex int, th
 				datalen := GetMavlinkDataLen(newbuf)
 				packlen := MavlinkPackLenMin + datalen
 				if lenbuf-i >= packlen { //数据包大小够
-					newcrc16 := CheckCrc16(newbuf[:packlen+MavlinkIndexCrc16])
+					newcrc16 :=CRC16(newbuf[3:packlen+MavlinkIndexCrc16],datalen)
 					packcrc := Bytes2Uint16(newbuf[packlen+MavlinkIndexCrc16 : packlen+MavlinkIndexCrc16+2])
 					if newcrc16 == packcrc { //校验和正确
 						bFind = true
