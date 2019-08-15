@@ -121,6 +121,7 @@ func dealCommInDataByCrc() {
 	}
 }
 
+
 //------------------------------------------------------------------------------
 //串口写数据
 func ComSend(s io.ReadWriteCloser) {
@@ -145,8 +146,10 @@ func ComSend(s io.ReadWriteCloser) {
 
 func StartSerial() {
 	s := OpoenSerialPort(ForwarderJson.Port, ForwarderJson.Baud)
-	//go ComSend(s)
-	go dealCommInDataByCrc()
+	go ComSend(s)
 	time.Sleep(time.Second)
-	go receiveCom(s)
+	go  pack_and_send()
+	/*go dealCommInDataByCrc()
+	time.Sleep(time.Second)
+	go receiveCom(s)*/
 }

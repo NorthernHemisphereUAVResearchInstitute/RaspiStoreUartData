@@ -5,36 +5,36 @@ import (
 )
 
 const (
-	MavlinkSyncFirst    = byte(0x55)              //mavlink packet 第一个标志字节
+	MavlinkSyncFirst    = byte(0xf0)              //mavlink packet 第一个标志字节
+	MavlinkSyncEnd    	= byte(0xfa)              //mavlink packet 最后个标志字节
 	MavlinkIndexDataLen = 1                       //数据长度索引
-	MavlinkIndexMsgId   = 2                       //消息id索引
-	MavlinkIndexCrc16   = -2                      //crc16索引
-	MavlinkPackHeadLen  = 3                       //包头长度
-	MavlinkPackLenMin   = 5                       //最小数据包长度
-	MavlinkLenMax       = MavlinkPackLenMin + 255 //最大数据包长度
-	VelPosMsgID         = 1
-	VelPosMsgLEN        = 24
+	MavlinkIndexPkg 	= 2
+	MavlinkIndexMSGID 	= 3
+	MavlinkIndexData    = 4
+	MavlinkIndexCrc16   = -3                      //crc16索引
+	MavlinkPackHeadLen  = 4                       //包头长度
+	MavlinkPackLenMin   = 7                       //最小数据包长度
+	MavlinkLenMax       = MavlinkPackLenMin + 28 //最大数据包长度
+	MavlinkLenPayLOADLen=28
+	IMU_RAW_PAYLOAD_LEN =28
 )
 
 //检查数据长度是否正确
-func CheckPackDataLen(msgid byte, datalen byte) (bRet bool) {
+func CheckPackDataLen(datalen byte) (bRet bool) {
 
-	if msgid == VelPosMsgID {
-		if datalen == VelPosMsgLEN {
-			bRet = true
-		} else {
-			bRet = false
-		}
+	if datalen == MavlinkLenPayLOADLen {
+		bRet = true
+	} else {
+		bRet = false
 	}
-
 	return bRet
 }
 
 //是否是有效的头部
 func IsValidPackHead(packHead []byte) (bOk bool) {
 	if len(packHead) >= MavlinkPackHeadLen {
-		if packHead[0] == MavlinkSyncFirst { //前导标示符相同
-			if CheckPackDataLen(packHead[MavlinkIndexMsgId], packHead[MavlinkIndexDataLen]) { // 数据包长度
+		if packHead[0] == MavlinkSyncFirst && packHead[MavlinkLenMax-1] == MavlinkSyncEnd { //前导标示符相同
+			if CheckPackDataLen(packHead[MavlinkIndexDataLen]) { // 数据包长度
 				bOk = true
 			} else {
 				bOk = false
@@ -61,7 +61,7 @@ func dealMavlinkCommInData(buf []byte, lenbuf int) (bFind bool, newIndex int, th
 				datalen := GetMavlinkDataLen(newbuf)
 				packlen := MavlinkPackLenMin + datalen
 				if lenbuf-i >= packlen { //数据包大小够
-					newcrc16 := CheckCrc16(newbuf[:packlen+MavlinkIndexCrc16])
+					newcrc16 := CRC16(newbuf[MavlinkIndexData : packlen+MavlinkIndexCrc16], MavlinkLenPayLOADLen)
 					packcrc := Bytes2Uint16(newbuf[packlen+MavlinkIndexCrc16 : packlen+MavlinkIndexCrc16+2])
 					if newcrc16 == packcrc { //校验和正确
 						bFind = true
