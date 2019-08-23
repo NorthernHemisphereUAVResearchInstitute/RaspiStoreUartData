@@ -54,7 +54,7 @@ func pack_and_send() {
 
 		BufInchanCommOut(buf[:], 20)
 
-		time.Sleep(80 * time.Millisecond)
+		time.Sleep(20 * time.Millisecond)
 
 	}
 }
