@@ -76,8 +76,7 @@ func Getfloat64ValueByString(value string) float64 {
 	return v
 }
 func Bytes2Uint16(data []byte) (value uint16) {
-	//value = binary.LittleEndian.Uint16(data)
-	value = binary.BigEndian.Uint16(data)
+	value = binary.LittleEndian.Uint16(data)
 	return value
 }
 
@@ -212,8 +211,8 @@ const (
         0x4380, 0x8341, 0x4100, 0x81C1, 0x8081, 0x4040, }
 
 func CRC16(buf []byte, len int)uint16 {
-     crc_result := uint16(0x0)
-     table_num := uint16(0x0)
+     crc_result := uint16(0x00)
+     table_num := uint16(0x00)
      
     for i := 0;i < len;i++  {
         table_num = ((crc_result & 0xff) ^ (uint16)(buf[i] & 0xff))

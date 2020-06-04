@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	constCommRawDataChanMaxcount = 512*2048
+	constCommRawDataChanMaxcount = 512
 	constChanMaxcount            = 256
 )
 

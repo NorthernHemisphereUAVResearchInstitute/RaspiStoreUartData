@@ -91,10 +91,7 @@ func dealCommInDataByCrc() {
 				lenbuf = 0
 			} else {
 				copy(buf[lenbuf:], data)
-
-				//fmt.Println(fmt.Sprintf("%x", buf))
 				lenbuf += len(data)
-				//fmt.Println(lenbuf)
 				//这里应该增加一个判断是否继续处理的函数，看是否是包头，不是包头一直处理,
 				headOffset := 0
 				for {
@@ -102,9 +99,7 @@ func dealCommInDataByCrc() {
 					if bFind {
 						//有数据包，处理
 						newbuf := buf[headOffset+newIndex:]
-						//fmt.Println(fmt.Sprintf("%x", newbuf))
-						fmt.Println(fmt.Sprintf("%x", newbuf[:100]))
-						DealMavlinkMsgRecv(newbuf[:53])
+						DealMavlinkMsgRecv(newbuf[:])
 					} else { //没有数据包了，退出
 						break
 					}
